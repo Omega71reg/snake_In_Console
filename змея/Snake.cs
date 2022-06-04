@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using змея;
 
 namespace змея
 {
@@ -16,30 +17,31 @@ namespace змея
             _headcolor = headColor;
             _bodycolor = bodeColor;
 
-            Head = new Pixel(initialX, initialY,_headcolor);
+            Head = new Pixel(initialX, initialY, _headcolor);
 
             for (int i = bodyLenght; i >= 0; i--)
             {
-                Body.Enqueue(new Pixel(Head.Y - i - 1 , initialY, _bodycolor));
+                Body.Enqueue(new Pixel(Head.Y - i - 1, initialY, _bodycolor));
             }
             Drow();
         }
         public Pixel Head { get; private set; }
         public Queue<Pixel> Body { get; } = new Queue<Pixel>();
-        public void Move(Direction direction)
+        public void Move(Direction direction, bool eat = false)
         {
             Clear();
 
             Body.Enqueue(new Pixel(Head.Y, Head.X, _bodycolor));
 
-            Body.Dequeue();
+            if (!eat)
+                Body.Dequeue();
 
             Head = direction switch
             {
                 Direction.Right => new Pixel(Head.Y + 1, Head.X, _headcolor),
-                Direction.Left  => new Pixel(Head.Y - 1, Head.X, _headcolor),
-                Direction.Up    => new Pixel(Head.Y, Head.X - 1, _headcolor),
-                Direction.Down  => new Pixel(Head.Y, Head.X + 1, _headcolor),
+                Direction.Left => new Pixel(Head.Y - 1, Head.X, _headcolor),
+                Direction.Up => new Pixel(Head.Y, Head.X - 1, _headcolor),
+                Direction.Down => new Pixel(Head.Y, Head.X + 1, _headcolor),
                 _ => Head
             };
             Drow();
@@ -50,7 +52,7 @@ namespace змея
             Head.Drow();
             foreach (Pixel pixel in Body)
             {
-                pixel.Drow();            
+                pixel.Drow();
             }
         }
         public void Clear()

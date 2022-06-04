@@ -3,6 +3,7 @@ using static System.Console;
 using System.Threading;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace змея
 {
@@ -18,19 +19,19 @@ namespace змея
 
         private const int РазмерконсолиШирина = Ширина * 3;
         private const int РазмерконсолиДлинна = Длинна * 3;
-        private const ConsoleColor BorderColor = ConsoleColor.Red;
+        private const ConsoleColor BorderColor = ConsoleColor.Magenta;
         private const ConsoleColor HeadColor = ConsoleColor.Yellow;
         private const ConsoleColor BodyColor = ConsoleColor.Cyan;
-        private const ConsoleColor FoodColor = ConsoleColor.Green;
+        private const ConsoleColor FoodColor = ConsoleColor.Red;
         static void Main(string[] args)
         {
             поле();
 
-            while(true)
+            while (true)
             {
                 StartGame();
                 Thread.Sleep(1000);
-                _ = Console.ReadKey();
+                _ = ReadKey();
             }
         }
 
@@ -47,34 +48,55 @@ namespace змея
             Pixel food = GenFood(snake);
             food.Drow();
 
-            Stopwatch sw = new Stopwatch();
+            int score = 0;
+
+            int lagMs = 0;
+
+            var sw = new Stopwatch();
 
             while (true)
             {
                 sw.Restart();
                 Direction oldMovement = currentMovement;
-                while (sw.ElapsedMilliseconds <= FrameMs)
+                while (sw.ElapsedMilliseconds <= FrameMs - lagMs)
                 {
                     if (currentMovement == oldMovement)
                     {
                         currentMovement = ReadMovement(currentMovement);
                     }
                 }
-                snake.Move(currentMovement);
 
-                if (snake.Head.X == Ширина - 1
-                    || snake.Head.X == 0
-                    || snake.Head.Y == Длинна - 1
+                sw.Restart();
+
+                if (snake.Head.X == food.X && snake.Head.Y == food.Y)
+                {
+                    snake.Move(currentMovement, true);
+                    food = GenFood(snake);
+                    food.Drow();
+                    score++;
+
+                    Task.Run(() => Beep(1200, 200));
+                }
+                else
+                {
+                    snake.Move(currentMovement);
+                }
+                if (snake.Head.Y == Ширина - 1
                     || snake.Head.Y == 0
+                    || snake.Head.X == Длинна - 1
+                    || snake.Head.X == 0
                     || snake.Body.Any(b => b.X == snake.Head.X && b.Y == snake.Head.Y))
                     break;
 
-                //System.Threading.Thread.Sleep(200);
+                lagMs = (int)sw.ElapsedMilliseconds;
             }
             snake.Clear();
+            food.Clear();
 
             SetCursorPosition(РазмерконсолиШирина / 3, РазмерконсолиДлинна / 2);
-            WriteLine("Game Over");
+            WriteLine($"Game Over, score: {score}");
+
+            Task.Run(() => Beep(200, 600));
 
         }
 
@@ -89,7 +111,7 @@ namespace змея
             return food;
         }
 
-        static Direction ReadMovement (Direction currentDirection)
+        static Direction ReadMovement(Direction currentDirection)
         {
             if (!KeyAvailable)
                 return currentDirection;
@@ -110,10 +132,10 @@ namespace змея
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Проверка совместимости платформы", Justification = "<Ожидание>")]
         static void поле()
         {
-            Console.SetBufferSize(РазмерконсолиШирина, РазмерконсолиДлинна);
-            Console.SetWindowSize(РазмерконсолиШирина, РазмерконсолиДлинна);
-           
-            Console.CursorVisible = false;
+            SetBufferSize(РазмерконсолиШирина, РазмерконсолиДлинна);
+            SetWindowSize(РазмерконсолиШирина, РазмерконсолиДлинна);
+
+            CursorVisible = false;
 
         }
 
@@ -127,7 +149,7 @@ namespace змея
             for (int i = 0; i < Длинна; i++)
             {
                 new Pixel(0, i, BorderColor).Drow();
-                new Pixel(Ширина-1,i, BorderColor).Drow();
+                new Pixel(Ширина - 1, i, BorderColor).Drow();
             }
         }
     }

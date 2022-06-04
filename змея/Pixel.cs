@@ -24,9 +24,9 @@ namespace змея
             for (int y = 0; y < pixelSize; y++)
             {
                 for (int x = 0; x < pixelSize; x++)
-                   
+
                 {
-                    Console.SetCursorPosition(Y*pixelSize+y,X*pixelSize+x);
+                    Console.SetCursorPosition(Y * pixelSize + y, X * pixelSize + x);
                     Console.Write(PixelChar);
                 }
             }
