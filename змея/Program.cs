@@ -43,7 +43,7 @@ namespace змея
 
             Direction currentMovement = Direction.Right;
 
-            var snake = new Snake(10, 5, HeadColor, BodyColor);
+            var snake = Snake.CreateSnake();
 
             Pixel food = GenFood(snake);
             food.Drow();

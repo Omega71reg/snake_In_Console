@@ -8,7 +8,15 @@ namespace змея
     {
         private readonly ConsoleColor _headcolor;
         private readonly ConsoleColor _bodycolor;
-        public Snake(int initialX,
+        #region Одиночка
+        private static Snake obj;
+        public static Snake CreateSnake()
+        {
+            if (obj == null) obj=new Snake(10, 5, ConsoleColor.Yellow, ConsoleColor.Blue);
+            return obj;
+        }
+        #endregion
+        private Snake(int initialX,
                      int initialY,
                      ConsoleColor headColor,
                      ConsoleColor bodeColor,
